@@ -1,48 +1,24 @@
-from django.core.paginator import Paginator
-from django.db.models import Q
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 
-from typing import Any, Dict
-
-from django import forms
-from django.core.exceptions import ValidationError
-
+from contact.forms import ContactForm
 from contact.models import Contact
 
 
-class ContactForm(forms.ModelForm):
-    class Meta:
-        model = Contact
-        fields = (
-            'first_name', 'last_name', 'phone',
-        )
-
-    def clean(self):
-        cleaned_data = self.cleaned_data
-
-        self.add_error(
-            'first_name',
-            ValidationError(
-                'Mensagem de erro',
-                code='invalid'
-            )
-        )
-        self.add_error(
-            'first_name',
-            ValidationError(
-                'Mensagem de erro 2',
-                code='invalid'
-            )
-        )
-
-        return super().clean()
-
-
 def create(request):
+    form_action = reverse('contact:create')
+
     if request.method == 'POST':
+        form = ContactForm(request.POST)
         context = {
-            'form': ContactForm(request.POST)
+            'form': form,
+            'form_action': form_action,
         }
+
+        if form.is_valid():
+            contact = form.save()
+            return redirect('contact:update', contact_id=contact.pk)
+
         return render(
             request,
             'contact/create.html',
@@ -51,7 +27,44 @@ def create(request):
     
 
     context = {
-        'form': ContactForm()
+        'form': ContactForm(),
+        'form_action': form_action,
+    }
+    
+    return render(
+        request,
+        'contact/create.html',
+        context
+    )
+
+
+def update(request, contact_id):
+    contact = get_object_or_404(
+        Contact, pk=contact_id, show=True
+        )
+    form_action = reverse('contact:update', args=(contact_id,))
+
+    if request.method == 'POST':
+        form = ContactForm(request.POST, instance=contact)
+        context = {
+            'form': form,
+            'form_action': form_action,
+        }
+
+        if form.is_valid():
+            contact = form.save()
+            return redirect('contact:update', contact_id=contact.pk)
+
+        return render(
+            request,
+            'contact/create.html',
+            context
+        )
+    
+
+    context = {
+        'form': ContactForm(instance=contact),
+        'form_action': form_action,
     }
     
     return render(
