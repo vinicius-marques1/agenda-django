@@ -6,6 +6,14 @@
 <body>
   {% include 'global/partials/_header.html' %}
 
+  {% if messages %}
+    {% for msg in messages %}
+      <div class="message {{ msg.tags }}">
+        {{ msg }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
   <main class="content">
     {% block content %}{% endblock %}
     {% include 'global/partials/_pagination.html' %}
