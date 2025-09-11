@@ -1,18 +1,20 @@
 from django.urls import path
-from .views import index, contact, search, create, update, delete, register
-
+from contact import views
 app_name = 'contact'
 
 urlpatterns = [
-    path('', index, name='index'),
-    path('search/', search, name='search'),
+    path('', views.index, name='index'),
+    path('search/', views.search, name='search'),
 
     # CRUD operations for contacts
-    path('contact/<int:contact_id>/', contact, name='contact'),
-    path('contact/create/', create, name='create'),
-    path('contact/<int:contact_id>/update/', update, name='update'),
-    path('contact/<int:contact_id>/delete/', delete, name='delete'),
+    path('contact/<int:contact_id>/', views.contact, name='contact'),
+    path('contact/create/', views.create, name='create'),
+    path('contact/<int:contact_id>/update/', views.update, name='update'),
+    path('contact/<int:contact_id>/delete/', views.delete, name='delete'),
 
     # user
-    path('user/create/', register, name='register'),
+    path('user/create/', views.register, name='register'),
+    path('user/login/', views.login_view, name='login'),
+    path('user/logout/', views.logout_view, name='logout'),
+    path('user/update/', views.user_update, name='user_update'),
 ]
